@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(raylib-study)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(CMAKE_C_COMPILER gcc)
 set(CMAKE_CXX_COMPILER g++)
 

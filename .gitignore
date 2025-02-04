@@ -2,6 +2,7 @@ build/
 .cache/
 lib/
 
+doctest.h
 raylib.h
 raymath.h
 rlgl.h

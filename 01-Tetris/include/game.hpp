@@ -2,9 +2,13 @@
 
 #include <vector>
 
-#include "block.hpp"
 #include "grid.hpp"
+#include "next_block.hpp"
+#include "score.hpp"
+
+#include "block.hpp"
 #include "position.hpp"
+#include "utils.hpp"
 
 class Game {
   public:
@@ -22,6 +26,10 @@ class Game {
     std::vector<Block> GetAllBlocks();
 
     Grid grid;
+    Score score;
+    NextBlock nextBlockBox;
+
+    bool isGameOver;
 
   private:
     bool IsBlockOutside();

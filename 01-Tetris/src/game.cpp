@@ -8,8 +8,19 @@
 
 #include "blocks.cpp"
 
+const int GRID_OFFSET_X = 20;
+const int GRID_OFFSET_Y = 20;
+
+const int NEXT_BOX_POS_X = 345;
+const int NEXT_BOX_POS_Y = 240;
+
 Game::Game() {
   grid = Grid();
+  score = Score();
+  nextBlockBox = NextBlock();
+
+  isGameOver = false;
+
   blocks = GetAllBlocks();
 
   currentBlock = GetRandomBlock();
@@ -35,22 +46,9 @@ std::vector<Block> Game::GetAllBlocks()
   return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
 }
 
-double lastUpdateTime = 0;
-
-bool EventTrigger(double interval)
-{
-  double currentTime = GetTime();
-  if(currentTime - lastUpdateTime >= interval)
-  {
-    lastUpdateTime = currentTime;
-    return true;
-  }
-  return false;
-}
-
 void Game::update()
 {
-  if (EventTrigger(0.4))
+  if (EventTrigger(0.4) && !isGameOver)
   {
     moveBlockDown();
   }
@@ -60,12 +58,32 @@ void Game::draw()
 {
   ClearBackground(RAYWHITE);
   grid.draw();
-  currentBlock.draw();
+  score.draw();
+  nextBlockBox.draw();
+
+  currentBlock.draw(GRID_OFFSET_X, GRID_OFFSET_Y);
+
+  switch(nextBlock.id)
+  {
+    case 3:
+      nextBlock.draw(NEXT_BOX_POS_X -  90, NEXT_BOX_POS_Y + 45);
+      break;
+    case 4:
+      nextBlock.draw(NEXT_BOX_POS_X - 120 + 30, NEXT_BOX_POS_Y + 30);
+      break;
+    default:
+      nextBlock.draw(NEXT_BOX_POS_X -  90 + 15, NEXT_BOX_POS_Y + 30);
+      break;
+  }
 }
 
 void Game::handleInput()
 {
   int keyPressed = GetKeyPressed();
+
+  if (isGameOver) {
+    return;
+  }
 
   switch(keyPressed) 
   {
@@ -130,7 +148,12 @@ void Game::lockBlock()
   }
   currentBlock = nextBlock;
   nextBlock = GetRandomBlock();
-  grid.ClearFullRows();
+
+  isGameOver = grid.isGameOver();
+
+  int scoreNum = grid.ClearFullRows();
+
+  score.addScore(scoreNum);
 }
 
 bool Game::IsBlockOutside()

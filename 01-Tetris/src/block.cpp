@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <vector>
 
+#include <iostream>
+
 Block::Block() {
   cellSize = 30;
   rotationState = 0;
@@ -13,12 +15,12 @@ Block::Block() {
   colors = GetCellColors();
 }
 
-void Block::draw() {
+void Block::draw(int offsetX, int offsetY) {
   std::vector<Position> tiles = GetCellPositions();
 
   for (Position item : tiles)
   {
-    DrawRectangle(item.col * cellSize + 1, item.row * cellSize + 1, cellSize - 1, cellSize - 1, colors[id]);
+    DrawRectangle(item.col * cellSize + 1 + offsetX, item.row * cellSize + 1 + offsetY, cellSize - 1, cellSize - 1, colors[id]);
   }
 }
 

@@ -8,7 +8,7 @@ set(CMAKE_CXX_COMPILER g++)
 add_definitions("-Wall -std=c++17")
 
 include_directories("${CMAKE_SOURCE_DIR}/include")
-link_directories("${CMAKE_SOURCE_DIR}/lib")
+# link_directories("${CMAKE_SOURCE_DIR}/lib")
 
 # Change path from /src if needed, or add more directories
 file(GLOB_RECURSE sources

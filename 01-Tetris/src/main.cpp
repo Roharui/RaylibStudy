@@ -1,8 +1,8 @@
 
-#include "raylib.h"
-#include "config.hpp"
+#include <raylib.h>
 
 #include "game.hpp"
+#include "config.hpp"
 
 //------------------------------------------------------------------------------------
 // Program main entry point

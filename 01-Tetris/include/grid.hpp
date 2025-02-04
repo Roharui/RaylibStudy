@@ -16,6 +16,8 @@ class Grid {
     bool IsCellEmpty(int row, int col);
     int ClearFullRows();
 
+    bool isGameOver();
+
     int grid[20][10];
 
   private:

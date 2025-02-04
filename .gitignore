@@ -1,2 +1,7 @@
 build/
 .cache/
+lib/
+
+raylib.h
+raymath.h
+rlgl.h

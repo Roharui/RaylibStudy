@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include <iostream>
 
@@ -11,22 +12,38 @@ using std::vector, std::map;
 
 class Game;
 class Scene;
-class Vault;
 class DefaultEngineDisplay;
 
-//
+// main Object
 class Game
 {
 public:
+  static Game *game;
+
+  static void init()
+  {
+    Game::game->_reset();
+    Game::game->_init();
+  }
+
+  static void draw() { Game::game->_draw(); }
+  static void update() { Game::game->_update(); }
+  static void clear() { Game::game->_clear(); }
+  static void appendScene(int keyCode, Scene *scene) { Game::game->_appendScene(keyCode, scene); }
+
   Game();
 
-  void draw();
-  void update();
-  void clear();
-
-  void appendScene(int keyScene, Scene *scene);
+protected:
+  virtual void _init() {};
 
 private:
+  void _reset();
+  void _draw();
+  void _update();
+  void _clear();
+
+  void _appendScene(int keyCode, Scene *scene);
+
   Scene *curScene;
   map<int, Scene *> mapScene;
 };
@@ -35,45 +52,54 @@ private:
 class Scene
 {
 public:
-  Scene();
-  Scene(vector<DefaultEngineDisplay *> vecOfDisplay);
+  Scene() = delete;
+  Scene(int sceneKeyCode);
 
+  void update();
   void draw();
 
+  void appendDisplay(DefaultEngineDisplay *display);
+  void removeDisplay(DefaultEngineDisplay *display);
+
 private:
+  void clickEvent();
+
   vector<DefaultEngineDisplay *> vecOfDisplay;
 };
 
-class Vault
-{
-public:
-  Vault();
-  ~Vault() {}
-
-  map<int, Scene> sceneMap;
-};
-
-// Default Class
+// Default Display Class
 class DefaultEngineDisplay
 {
 public:
-  static Vault *vault;
-
-  DefaultEngineDisplay();
-  DefaultEngineDisplay(Rectangle relativeRect);
-  DefaultEngineDisplay(DefaultEngineDisplay *parent);
-  DefaultEngineDisplay(Rectangle relativeRect, DefaultEngineDisplay *parent);
+  DefaultEngineDisplay() = delete;
+  DefaultEngineDisplay(const char *name, Scene *scene);
+  DefaultEngineDisplay(const char *name, DefaultEngineDisplay *parent);
+  DefaultEngineDisplay(const char *name, Rectangle relativeRect, Scene *scene);
+  DefaultEngineDisplay(const char *name, Rectangle relativeRect, DefaultEngineDisplay *parent);
 
   void draw();
-  void move(Vector2 loc);
+  void clickEvent(MouseButton mouseBtn);
 
-  Rectangle relativeRect;
-  Rectangle absoluteRect;
+  void move(Vector2 loc);
+  void remove();
+
+  bool isRootDisplay();
+  bool isLocInside(Vector2 loc);
+
+  Scene *scene;
 
 protected:
   virtual void drawCurrentDisplay() {}
+  virtual bool leftClickEventCurrent() { return false; }
+  virtual bool rightClickEventCurrent() { return false; }
 
-private:
+  void removeChildDisplay(DefaultEngineDisplay *display);
+
+  const char *name;
+  Rectangle relativeRect;
+  Rectangle absoluteRect;
+
+  DefaultEngineDisplay *rootDisplay;
   DefaultEngineDisplay *parentDisplay;
   vector<DefaultEngineDisplay *> childDisplayVector;
 };

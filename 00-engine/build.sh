@@ -1,10 +1,8 @@
 
-export LIBRARY_PATH=/home/roharui/Projects/raylib/raylib-library
+CMAKE_ARG=NOTHING
+BUILD_PATH=
 
-if [ "exec" == $1 ]; then
-  CMAKE_ARG=RUNTIME_EXEC
-  BUILD_PATH=
-elif [ "lib" == $1 ]; then
+if [ "lib" == $1 ]; then
   CMAKE_ARG=RUNTIME_LIB
   BUILD_PATH=lib
 elif [ "test" == $1 ]; then

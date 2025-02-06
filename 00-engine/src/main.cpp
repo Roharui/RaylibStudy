@@ -5,31 +5,51 @@
 
 #define TEST_SCENE 0
 
-Vault *DefaultEngineDisplay::vault = new Vault();
-
 class TestDisplayOne : public DefaultEngineDisplay
 {
 public:
   using DefaultEngineDisplay::DefaultEngineDisplay;
+  int id = 0;
 
 protected:
-  void drawCurrentDisplay() override
-  {
-    DrawRectangleRec(absoluteRect, BLUE);
-  }
+  void drawCurrentDisplay() override;
+
+  bool leftClickEventCurrent() override;
+  bool rightClickEventCurrent() override;
 };
 
-class TestDisplayTwo : public DefaultEngineDisplay
+void TestDisplayOne::drawCurrentDisplay()
 {
-public:
-  using DefaultEngineDisplay::DefaultEngineDisplay;
+  DrawRectangleRec({absoluteRect.x - 1, absoluteRect.y - 1, absoluteRect.width + 1, absoluteRect.height + 1}, BLACK);
+  DrawRectangleRec(absoluteRect, BLUE);
+}
 
+bool TestDisplayOne::leftClickEventCurrent()
+{
+  std::cout << this->name << "\n";
+  return true;
+}
+
+bool TestDisplayOne::rightClickEventCurrent()
+{
+  this->remove();
+  return true;
+}
+
+class MyGame : public Game
+{
 protected:
-  void drawCurrentDisplay() override
+  void _init() override
   {
-    DrawRectangleRec(absoluteRect, RED);
+    Scene *scene1 = new Scene(TEST_SCENE);
+
+    DefaultEngineDisplay *t1 = new TestDisplayOne("First Display", {10, 10, 100, 100}, scene1);
+    DefaultEngineDisplay *t2 = new TestDisplayOne("Second Display", {30, 30, 100, 100}, t1);
+    DefaultEngineDisplay *t3 = new TestDisplayOne("Third Display", {30, 30, 100, 100}, t2);
   }
 };
+
+Game *Game::game = new MyGame();
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -46,29 +66,28 @@ int main(void)
   SetTargetFPS(60); // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
 
-  DefaultEngineDisplay *t1 = new TestDisplayOne({10, 20, 100, 30});
-  DefaultEngineDisplay *t2 = new TestDisplayTwo({10, 20, 30, 20}, t1);
-
-  Scene *scene1 = new Scene({t1});
-
-  Game game;
-
-  game.appendScene(TEST_SCENE, scene1);
+  Game::init();
 
   // Main game loop
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
     // Update
     //----------------------------------------------------------------------------------
-    game.update();
+    Game::update();
+
+    int key = GetKeyPressed();
+    if (key == KEY_R)
+    {
+      Game::init();
+    }
     //----------------------------------------------------------------------------------
 
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
-    game.clear();
-    game.draw();
+    Game::clear();
+    Game::draw();
 
     EndDrawing();
     //----------------------------------------------------------------------------------

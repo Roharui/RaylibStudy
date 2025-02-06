@@ -3,32 +3,32 @@
 
 #include "rayengine.h"
 
-class TestDisplayOne : public DefaultEngineDisplay {
-  public:
-    TestDisplayOne() : DefaultEngineDisplay() {}
-    TestDisplayOne(Vector2 offset) : DefaultEngineDisplay(offset) {};
-    TestDisplayOne(DefaultEngineDisplay* parentDisplay) : DefaultEngineDisplay(parentDisplay) {}
-    TestDisplayOne(Vector2 offset, DefaultEngineDisplay *parent) : DefaultEngineDisplay(offset, parent) {}
-  
-  protected:
-    virtual void drawCurrentDisplay() override
-    {
-      DrawRectangleRec({offset.x, offset.y, 100, 100}, BLUE);
-    }
+#define TEST_SCENE 0
+
+Vault *DefaultEngineDisplay::vault = new Vault();
+
+class TestDisplayOne : public DefaultEngineDisplay
+{
+public:
+  using DefaultEngineDisplay::DefaultEngineDisplay;
+
+protected:
+  void drawCurrentDisplay() override
+  {
+    DrawRectangleRec(absoluteRect, BLUE);
+  }
 };
 
-class TestDisplayTwo : public DefaultEngineDisplay {
-  public:
-    TestDisplayTwo() : DefaultEngineDisplay() {}
-    TestDisplayTwo(Vector2 offset) : DefaultEngineDisplay(offset) {};
-    TestDisplayTwo(DefaultEngineDisplay* parentDisplay) : DefaultEngineDisplay(parentDisplay) {}
-    TestDisplayTwo(Vector2 offset, DefaultEngineDisplay *parent) : DefaultEngineDisplay(offset, parent) {}
+class TestDisplayTwo : public DefaultEngineDisplay
+{
+public:
+  using DefaultEngineDisplay::DefaultEngineDisplay;
 
-  protected:
-    virtual void drawCurrentDisplay() override
-    {
-      DrawRectangleRec({offset.x, offset.y, 20, 20}, RED);
-    }
+protected:
+  void drawCurrentDisplay() override
+  {
+    DrawRectangleRec(absoluteRect, RED);
+  }
 };
 
 //------------------------------------------------------------------------------------
@@ -36,51 +36,48 @@ class TestDisplayTwo : public DefaultEngineDisplay {
 //------------------------------------------------------------------------------------
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+  // Initialization
+  //--------------------------------------------------------------------------------------
+  const int screenWidth = 800;
+  const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "Engine Test");
+  InitWindow(screenWidth, screenHeight, "Engine Test");
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-    
-    TestDisplayOne t1 = TestDisplayOne({10, 20});
-    TestDisplayTwo t2 = TestDisplayTwo({10, 20}, (DefaultEngineDisplay *) &t1); 
+  SetTargetFPS(60); // Set our game to run at 60 frames-per-second
+  //--------------------------------------------------------------------------------------
 
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        // Update
-        //----------------------------------------------------------------------------------
-        int key = GetKeyPressed();
+  DefaultEngineDisplay *t1 = new TestDisplayOne({10, 20, 100, 30});
+  DefaultEngineDisplay *t2 = new TestDisplayTwo({10, 20, 30, 20}, t1);
 
-        if (key == KEY_RIGHT)
-        {
-          t1.move({20, 0});
-        }
+  Scene *scene1 = new Scene({t1});
 
-        //----------------------------------------------------------------------------------
+  Game game;
 
-        // Draw
-        //----------------------------------------------------------------------------------
-        BeginDrawing();
+  game.appendScene(TEST_SCENE, scene1);
 
-            ClearBackground(RAYWHITE);
+  // Main game loop
+  while (!WindowShouldClose()) // Detect window close button or ESC key
+  {
+    // Update
+    //----------------------------------------------------------------------------------
+    game.update();
+    //----------------------------------------------------------------------------------
 
-            DrawRectangleRec({190, 200, 600, 100}, RED);
-            DrawTextCenter("Congrats! You created your first window!", {190, 200, 600, 100}, 20, LIGHTGRAY);
-            t1.draw();
+    // Draw
+    //----------------------------------------------------------------------------------
+    BeginDrawing();
 
-        EndDrawing();
-        //----------------------------------------------------------------------------------
-    }
+    game.clear();
+    game.draw();
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
+    EndDrawing();
+    //----------------------------------------------------------------------------------
+  }
 
-    return 0;
+  // De-Initialization
+  //--------------------------------------------------------------------------------------
+  CloseWindow(); // Close window and OpenGL context
+  //--------------------------------------------------------------------------------------
+
+  return 0;
 }
